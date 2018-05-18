@@ -8,16 +8,30 @@ const path = require('path');
 app.use('/', express.static(path.join(__dirname, '../client/dist')));
 
 const http = require('http');
+const https = require('https');
 
 app.post('/url/:url', (req, res) => {
 	let url = req.params.url.split(':')[1];
+
 	http.get({ host: url }, response => {
 		let body = '';
 		response.on('data', chunk => {
 			body += chunk;
 		})
 		response.on('end', () => {
-		  res.send(body);
+		  if (body === '') {
+		  	https.get({ host: url }, response => {
+		  		let body = '';
+				response.on('data', chunk => {
+					body += chunk;
+				})
+				response.on('end', () => {		  		
+					res.send(body);
+				})
+			})
+		  } else {
+			  res.send(body);		  	
+		  }
 		})
 	})
 })
