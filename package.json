@@ -18,9 +18,12 @@
   },
   "homepage": "https://github.com/zismano/jobqueue#readme",
   "dependencies": {
+    "axios": "^0.18.0",
     "body-parser": "^1.18.3",
     "express": "^4.16.3",
+    "http": "0.0.0",
     "kue": "~0.6.2",
+    "nodemon": "^1.17.4",
     "path": "^0.12.7",
     "react": "^16.3.2",
     "react-dom": "^16.3.2"
