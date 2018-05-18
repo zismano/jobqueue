@@ -11,7 +11,7 @@ let FetchUrl = props => {
 				</input>
 				<button onClick={(e) => {
 					e.preventDefault();
-					props.getUrl(url.value);
+					props.FetchUrl(url.value);
 				}}>Submit</button>
 			</form>
 		</div>
