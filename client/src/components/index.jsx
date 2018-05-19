@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import FetchUrl from './fetchUrl.jsx';
+import CheckStatus from './CheckStatus.jsx';
 
 const axios = require('axios');
 
@@ -16,7 +17,7 @@ class App extends React.Component {
 			counter: 0,
 		}
 		this.fetchUrlFromUser = this.fetchUrlFromUser.bind(this);
-		// this.getIdForUrl = this.getIdForUrl.bind(this);
+		this.checkJob = this.checkJob.bind(this);
 	}
 
 	createMarkup() {
@@ -56,13 +57,17 @@ class App extends React.Component {
 				content.setState({ 
 					currJob: { 
 						url, 
-						id: id.data.id,
+						id: counter + 1,
 					},
 					counter: counter + 1
 				})				
 			}
 		})
 		.catch(err => { throw err });			
+	}
+
+	checkJob(jobId) {
+
 	}
 
 	render() {
@@ -75,11 +80,14 @@ class App extends React.Component {
 				<h2>Please enter a url:</h2>
 				<FetchUrl 
 					FetchUrl={this.fetchUrlFromUser} 
-					currJob = {this.state.currJob}
+					currJob={this.state.currJob}
 				/>
-{/*				<CheckStatus />								 
-*/}			</div>
-			 )
+				<CheckStatus 
+					checkJob={this.checkJob}
+					maxJobs={this.state.counter}
+				/>								 
+			</div>
+			)
 		)
 	}
 }
