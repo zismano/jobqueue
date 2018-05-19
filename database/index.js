@@ -24,6 +24,7 @@ const doesUrlHaveJobId = (urlFromUser, cb) => {
 	  		cb(doc.id);
 	  	}
 	  })
+	  .catch(err => throw err)
 	});	
 }
 
