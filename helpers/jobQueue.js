@@ -1,30 +1,25 @@
 const http = require('http');
 const https = require('https');
 const kue = require('kue');
-const db = require('mongodb');
+const db = require('../database/index.js');
 
 let jobs = kue.createQueue();
 
-const getJobIdForUrl = (url, callback) => {	
+const addJobToQueue = (url, callback) => {	
 	let job = jobs.create('new_job', {
 		url,
-		body: '',
+	}).save(err => {
+		if (err) throw err;
+		callback(`${url} was added to queue with job id ${job.id}`);
 	})
-	// .save(err => {
-	// 	if (!err) {
-	// 		console.log(job.id);
-	// 		callback(job.id);						
-	// 	}
-	// });
 
 	job
 	.on('complete', function() {
-		console.log('Job', job.id, 'with name', job.data.url, 'is done', job.data.body);
+		console.log('Job', job.id, 'with name', job.data.url, 'is done');
 	})
 	.on('failed', function() {
 		console.log('Job', job.id, 'with name', job.data.url, 'has failed');
 	})
-	job.save();
 };
 
 jobs.process('new_job', function(job, done) {
@@ -41,21 +36,22 @@ jobs.process('new_job', function(job, done) {
 					body += chunk;
 				})
 				res.on('end', () => {		  		
-					job.update(function() {
-						job.data.body = body;
+					db.addHTMLtoId(job.id, job.data.url, body, (err, res) => {
+						if (err) throw err;
+						console.log(`id ${job.id}, job ${job.data.url} done fetching html`);
 					})
 				})
 			})
 		  } else {
-			  job.update(function() {
-			  	job.data.body = body;
-			  	done && done();
-			  })	  	
+			db.addHTMLtoId(job.id, job.data.url, body, (err, res) => {
+				if (err) throw err;
+				console.log(`id ${job.id}, job ${job.data.url} done fetching html`);
+			})	  	
 		  }
 		})
 	})
 })
 
 module.exports = {
-	getJobIdForUrl,	
+	addJobToQueue,	
 }
