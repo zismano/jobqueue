@@ -5,15 +5,9 @@ const db = require('../database/index.js');
 
 let jobs = kue.createQueue();
 
-const addJobToQueue = (url, callback) => {	
+const addJobToQueue = (url, cb) => {	
 	let job = jobs.create('new_job', {
 		url,
-	}).save(err => {
-		if (err) {
-			callback(err);
-		} else {
-			callback(null, job.id);			
-		}
 	})
 
 	job
@@ -25,6 +19,11 @@ const addJobToQueue = (url, callback) => {
 	})
 	.on('failed', function() {
 		console.log(`Job ${job.id} with url ${job.data.url} has failed`);
+	})
+
+	job.save(err => {
+		if (err) throw err;
+		// check cb(job.id)
 	})
 };
 
