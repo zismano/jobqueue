@@ -49,15 +49,21 @@ app.post('/url/:url', (req, res) => {
 			}
 			res.send(responseObject);			
 		} else {
-			jobQueue.addJobToQueue(url, (err, id) => {
-				if (err) throw err;
-				let responseObject = {
-					title: 'New job',
-					url,
-					id,
-				}
-				res.send(responseObject);
-			})
+			// jobQueue.addJobToQueue(url, (err, id) => {
+			// 	if (err) throw err;
+			// 	let responseObject = {
+			// 		title: 'New job',
+			// 		url,
+			// 		id,
+			// 	}
+			// 	res.send(responseObject);
+			// })
+			jobQueue.addJobToQueue(url);
+			let responseObject = {
+				title: 'New job',
+				url,
+			}
+			res.send(responseObject);
 		}
 	})
 });
