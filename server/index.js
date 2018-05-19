@@ -40,13 +40,23 @@ const jobQueue = require('../helpers/jobQueue.js');
 app.post('/url/:url', (req, res) => {
 	let url = req.params.url.split(':')[1];	// extract url from request
 	// check if url already has id
-	db.doesUrlHaveJobId(url, id => {
+	db.doesUrlHaveJobId(url, (id) => {
 		if (id) {
-			res.send('Job has id!');			
+			let responseObject = {
+				title: 'Job already has id',
+				url,
+				id,
+			}
+			res.send(responseObject);			
 		} else {
 			jobQueue.addJobToQueue(url, (err, id) => {
 				if (err) throw err;
-				res.send(id);							
+				let responseObject = {
+					title: 'New job',
+					url,
+					id,
+				}
+				res.send(responseObject);
 			})
 		}
 	})
@@ -57,9 +67,9 @@ app.get('/id/:id', (req, res) => {
 	// check html of id in db
 	db.findHTMLOfId(id, data => {
 		if (data) {
-			res.send(data);
+			res.sendStatus(200).send(data);
 		} else {
-			res.send('Job is not finished yet');
+			res.sendStatus(200).send('Job is not finished yet');
 		}
 	})
 	// keep track of id (check if user put something else than number)
