@@ -44,8 +44,9 @@ app.post('/url/:url', (req, res) => {
 		if (id) {
 			res.send('Job has id!');			
 		} else {
-			jobQueue.addJobToQueue(url, (id) => {
-				res.send(`url ${url} got id ${id}`);							
+			jobQueue.addJobToQueue(url, (err, id) => {
+				if (err) throw err;
+				res.send(id);							
 			})
 		}
 	})
