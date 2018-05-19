@@ -9,8 +9,11 @@ const addJobToQueue = (url, callback) => {
 	let job = jobs.create('new_job', {
 		url,
 	}).save(err => {
-		if (err) throw err;
-		callback(`${url} was added to queue with job id ${job.id}`);
+		if (err) {
+			callback(err);
+		} else {
+			callback(null, job.id);			
+		}
 	})
 
 	job
