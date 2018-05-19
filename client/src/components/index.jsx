@@ -9,10 +9,14 @@ class App extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			url: '',
-			id: ''
+			currJob: {
+				url: '',
+				id: '',
+			},
+			counter: 0,
 		}
 		this.fetchUrlFromUser = this.fetchUrlFromUser.bind(this);
+		// this.getIdForUrl = this.getIdForUrl.bind(this);
 	}
 
 	createMarkup() {
@@ -21,7 +25,7 @@ class App extends React.Component {
 
 	fetchUrlFromUser(url) {
 		if (this.isValidUrl) {
-			this.getIdForUrl(url);
+			this.getIdForUrl(this, url);
 		} else {
 			console.log('not valid url')
 		}
@@ -38,13 +42,26 @@ class App extends React.Component {
 		return false;
 	}
 
-	getIdForUrl(url) {
+	getIdForUrl(content, url) {
 		axios.post(`/url/:${url}`, {
 			params: {
 				url,			
 			},
 		})
-		.then(id => this.setState({ url, id }))
+		.then(id => {
+			if (id.data.title === 'Job already has id') {
+				alert(`Job ${id.data.url} already has id ${id.data.id}`);
+			} else if (id.data.title === 'New job') {
+				let counter = content.state.counter;
+				content.setState({ 
+					currJob: { 
+						url, 
+						id: id.data.id,
+					},
+					counter: counter + 1
+				})				
+			}
+		})
 		.catch(err => { throw err });			
 	}
 
@@ -56,8 +73,11 @@ class App extends React.Component {
 			<div>
 				<h1>Welcome to Job Queue</h1>
 				<h2>Please enter a url:</h2>
-				<FetchUrl FetchUrl={this.fetchUrlFromUser} />
-{/*// {/*			<CheckStatus />
+				<FetchUrl 
+					FetchUrl={this.fetchUrlFromUser} 
+					currJob = {this.state.currJob}
+				/>
+{/*				<CheckStatus />								 
 */}			</div>
 			 )
 		)
