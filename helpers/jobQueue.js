@@ -18,10 +18,13 @@ const addJobToQueue = (url, callback) => {
 
 	job
 	.on('complete', function() {
-		console.log('Job', job.id, 'with name', job.data.url, 'is done');
+		console.log(`Job ${job.id} with url ${job.data.url} is completed`);
+		job.on('remove', function() {
+			console.log(`Job ${job.id} with url ${job.data.url} is removed from queue`);
+		})
 	})
 	.on('failed', function() {
-		console.log('Job', job.id, 'with name', job.data.url, 'has failed');
+		console.log(`Job ${job.id} with url ${job.data.url} has failed`);
 	})
 };
 
