@@ -16,15 +16,15 @@ const doesUrlHaveJobId = (urlFromUser, cb) => {
 	 
 	  const jobsDB = client.db(dbName);
 
-	  jobsDB.collection("urls").findOne({'url': urlFromUser})
+	  jobsDB.collection("urls").findOne({"url": urlFromUser})
 	  .then(doc => {
 	  	if (!doc) {
 	  		cb(null);
 	  	} else {
-	  		cb(doc.id);
+	  		cb(doc.jobId);
 	  	}
 	  })
-	  .catch(err => throw err)
+	  .catch(err => { throw err })
 	});	
 }
 
@@ -35,11 +35,9 @@ const findHTMLOfId = (id, cb) => {
 	 
 	  const jobsDB = client.db(dbName);
 
-	  jobsDB.collection("urls").findOne({'jobId': id})
+	  jobsDB.collection("urls").findOne({"jobId": id})
 	  .then(doc => {
-	  	if (!doc) {
-	  		cb(null);
-	  	} else {
+	  	if (doc) {
 	  		cb(doc.data);
 	  	}
 	  })
