@@ -13,9 +13,10 @@ const addJobToQueue = (url, cb) => {
 	job
 	.on('complete', function() {
 		console.log(`Job ${job.id} with url ${job.data.url} is completed`);
-		job.on('remove', function() {
-			console.log(`Job ${job.id} with url ${job.data.url} is removed from queue`);
-		})
+		kue.Job.get(job.id, (err, job) => {
+			job.remove();
+			console.log(`Job ${job.id} with url ${job.data.url} was removed from queue`);
+		} )
 	})
 	.on('failed', function() {
 		console.log(`Job ${job.id} with url ${job.data.url} has failed`);
