@@ -23,12 +23,12 @@ const addJobToQueue = (url, cb) => {
 
 	job.save(err => {
 		if (err) throw err;
-		// check cb(job.id)
+		cb(job.id);
 	})
 };
 
 jobs.process('new_job', function(job, done) {
-	http.get({ host: job.data.url }, res => {
+	let request = http.get({ host: job.data.url }, res => {
 		let body = '';
 		res.on('data', chunk => {
 			body += chunk;
@@ -44,6 +44,7 @@ jobs.process('new_job', function(job, done) {
 					db.addHTMLtoId(job.id, job.data.url, body, (err, res) => {
 						if (err) throw err;
 						console.log(`id ${job.id}, job ${job.data.url} done fetching html`);
+						done && done();
 					})
 				})
 			})
@@ -51,8 +52,16 @@ jobs.process('new_job', function(job, done) {
 			db.addHTMLtoId(job.id, job.data.url, body, (err, res) => {
 				if (err) throw err;
 				console.log(`id ${job.id}, job ${job.data.url} done fetching html`);
+				done && done();
 			})	  	
 		  }
+		})
+	})
+	request.on('error', (err) => {
+		db.addHTMLtoId(job.id, job.data.url, 'URL is not valid', (err, res) => {
+			if (err) throw err;
+			console.log(`id ${job.id}, job ${job.data.url} is not valid`);
+			done && done();
 		})
 	})
 })
