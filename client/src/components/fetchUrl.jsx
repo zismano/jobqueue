@@ -17,7 +17,7 @@ const FetchUrl = props => {
 				</button>
 			</form>
 			{ url !== '' ? (
-			  	<div>{url} added to queue with job id {id}</div>
+			  	<div>url {url} was recently added to queue with job id {id}</div>
 			  ) : (
 			  	<div></div>
 			  ) }
