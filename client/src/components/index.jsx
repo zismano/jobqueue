@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 
 import FetchUrl from './fetchUrl.jsx';
 import CheckStatus from './CheckStatus.jsx';
+import JobList from './JobList.jsx';
 
 const axios = require('axios');
 
@@ -11,6 +12,7 @@ class App extends React.Component {
 		super(props);
 		this.state = {
 			uploadUrl: '',
+			allJobs: [],
 			currJob: {
 				url: '',
 				id: '',
@@ -18,6 +20,18 @@ class App extends React.Component {
 		}
 		this.fetchUrlFromUser = this.fetchUrlFromUser.bind(this);
 		this.checkJob = this.checkJob.bind(this);
+	}
+
+	componentDidMount() {
+		axios.get('/storedJobs', {})
+		.then(jobs => {	
+			this.setState({
+				allJobs: jobs.data,
+			})
+		})
+		.catch(err => {
+			throw err;
+		})
 	}
 
 	createMarkup() {
@@ -32,7 +46,7 @@ class App extends React.Component {
 		}
 	}
 
-	isValidUrl(url) {	// returns true if url has 1-3 dotts in name and no spaces
+	isValidUrl(url) {	// very basic check, returns true if url has 1-3 dotts in name and no spaces
 		let splittledUrl = url.split(' ');
 		if (splittedUrl.length === 1) {
 			let splittedUrl = url.split('.');
@@ -54,11 +68,14 @@ class App extends React.Component {
 			if (title === 'Job already has id') {
 				alert(`Job ${url} already has id ${id}`);
 			} else if (title === 'New job') {
+				let allJobs = this.state.allJobs;
+				allJobs.push({url, id});
 				content.setState({ 
 					currJob: { 
 						url, 
 						id,
 					},
+					allJobs,
 				})				
 			}
 		})
@@ -96,6 +113,9 @@ class App extends React.Component {
 				/>
 				<CheckStatus 
 					checkJob={this.checkJob}
+				/>
+				<JobList
+					JobList={this.state.allJobs} 
 				/>
 			</div>
 			)
