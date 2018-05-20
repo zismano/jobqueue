@@ -11,32 +11,6 @@ const db = require('../database/index.js');
 
 const jobQueue = require('../helpers/jobQueue.js');
 
-
-// app.get('/url/:url', (req, res) => {
-// 	let url = req.params.url.split(':')[1];
-// 	http.get({ host: url }, response => {
-// 		let body = '';
-// 		response.on('data', chunk => {
-// 			body += chunk;
-// 		})
-// 		response.on('end', () => {
-// 		  if (body === '') {
-// 		  	https.get({ host: url }, response => {
-// 		  		let body = '';
-// 				response.on('data', chunk => {
-// 					body += chunk;
-// 				})
-// 				response.on('end', () => {		  		
-// 					res.send(body);
-// 				})
-// 			})
-// 		  } else {
-// 			  res.send(body);		  	
-// 		  }
-// 		})
-// 	})
-// })
-
 app.post('/url/:url', (req, res) => {
 	let url = req.params.url.split(':')[1];	// extract url from request
 	// check if url already has id
@@ -49,21 +23,14 @@ app.post('/url/:url', (req, res) => {
 			}
 			res.send(responseObject);			
 		} else {
-			// jobQueue.addJobToQueue(url, (err, id) => {
-			// 	if (err) throw err;
-			// 	let responseObject = {
-			// 		title: 'New job',
-			// 		url,
-			// 		id,
-			// 	}
-			// 	res.send(responseObject);
-			// })
-			jobQueue.addJobToQueue(url);
-			let responseObject = {
-				title: 'New job',
-				url,
-			}
-			res.send(responseObject);
+			jobQueue.addJobToQueue(url, (id) => {				
+				let responseObject = {
+					title: 'New job',
+					url,
+					id,
+				}
+				res.send(responseObject);
+			})
 		}
 	})
 });
@@ -71,11 +38,13 @@ app.post('/url/:url', (req, res) => {
 app.get('/id/:id', (req, res) => {
 	let id = req.params.id.split(':')[1];
 	// check html of id in db
-	db.findHTMLOfId(id, data => {
-		if (data) {
-			res.sendStatus(200).send(data);
+	db.findHTMLOfId(id, answer => {
+		if (answer === 'No id was found') {
+			res.send('Job is still in queue');	// job is still in queue
+		} else if (answer.data === 'URL is not valid') {
+			res.send(answer);
 		} else {
-			res.sendStatus(200).send('Job is not finished yet');
+			res.send(answer);
 		}
 	})
 	// keep track of id (check if user put something else than number)
