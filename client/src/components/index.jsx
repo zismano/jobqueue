@@ -11,14 +11,14 @@ class App extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			uploadUrl: '',
-			allJobs: [],
+			uploadUrl: '',	// stored state of external html body
+			allJobs: [],	// all jobs (db/queue)
 		}
 		this.fetchUrlFromUser = this.fetchUrlFromUser.bind(this);
 		this.checkJob = this.checkJob.bind(this);
 	}
 
-	componentDidMount() {
+	componentDidMount() {	// render all previous jobs from db
 		axios.get('/storedJobs', {})
 		.then(jobs => {	
 			this.setState({
@@ -30,11 +30,11 @@ class App extends React.Component {
 		})
 	}
 
-	createMarkup() {
+	createMarkup() {	// sets inner html
 		return {__html: this.state.uploadUrl}
 	}
 
-	fetchUrlFromUser(url) {
+	fetchUrlFromUser(url) {	// fetches url from user after user enters url, and retrieves job id
 		this.cleanUploadUrl();
 		if (this.isValidUrl) {
 			this.getIdForUrl(this, url);
@@ -54,7 +54,7 @@ class App extends React.Component {
 		return false;
 	}
 
-	getIdForUrl(content, url) {
+	getIdForUrl(content, url) {		// retrieves id (or alert) for entered url
 		axios.post(`/url/:${url}`, {
 			params: {
 				url,			
@@ -73,7 +73,7 @@ class App extends React.Component {
 		.catch(err => { throw err });			
 	}
 
-	checkJob(id) {
+	checkJob(id) {	// checks status of id, when user enters job id
 		this.cleanUploadUrl();
 		if (this.isValidId(id)) {
 			axios.get(`/id/:${id}`, {
@@ -96,7 +96,7 @@ class App extends React.Component {
 		}
 	}
 
-	isValidId(id) {
+	isValidId(id) {		// checks if id entered is valid. Assumption: last element in allJobs state is highest id
 		let allJobs = this.state.allJobs;
 		if (allJobs.length && 
 			id > 0 &&
@@ -107,7 +107,7 @@ class App extends React.Component {
 		return false;
 	}
 
-	cleanUploadUrl() {
+	cleanUploadUrl() {	// cleans uploadUrl 
 		this.setState({ uploadUrl: '' });
 	}
 

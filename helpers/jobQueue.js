@@ -5,7 +5,7 @@ const db = require('../database/index.js');
 
 let jobs = kue.createQueue();
 
-const addJobToQueue = (url, cb) => {	
+const addJobToQueue = (url, cb) => {	// adds job to queue, on complete - removes it from queue	
 	let job = jobs.create('new_job', {
 		url,
 	})
@@ -29,14 +29,14 @@ const addJobToQueue = (url, cb) => {
 };
 
 jobs.process('new_job', function(job, done) {
-	let request = http.get({ host: job.data.url }, res => {
+	let request = http.get({ host: job.data.url }, res => {	// http
 		let body = '';
 		res.on('data', chunk => {
 			body += chunk;
 		})
 		res.on('end', () => {
-		  if (body === '') {
-		  	https.get({ host: job.data.url }, res => {
+		  if (body === '') {	// if there's no body, check for https (secure) request
+		  	https.get({ host: job.data.url }, res => {	
 		  		let body = '';
 				res.on('data', chunk => {
 					body += chunk;
