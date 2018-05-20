@@ -35,6 +35,7 @@ class App extends React.Component {
 	}
 
 	fetchUrlFromUser(url) {
+		this.cleanUploadUrl();
 		if (this.isValidUrl) {
 			this.getIdForUrl(this, url);
 		} else {
@@ -73,6 +74,7 @@ class App extends React.Component {
 	}
 
 	checkJob(id) {
+		this.cleanUploadUrl();
 		if (this.isValidId(id)) {
 			axios.get(`/id/:${id}`, {
 				params: {
@@ -105,12 +107,13 @@ class App extends React.Component {
 		return false;
 	}
 
+	cleanUploadUrl() {
+		this.setState({ uploadUrl: '' });
+	}
+
 	render() {
 		let currJob = this.state.allJobs[this.state.allJobs.length - 1] || { url: '', id: ''};
 		return (
-			this.state.uploadUrl ? (
-			<div dangerouslySetInnerHTML={this.createMarkup()}></div>
-			) : (
 			<div>
 				<h1>Welcome to Job Queue</h1>
 				<h2>Please enter a url:</h2>
@@ -124,8 +127,17 @@ class App extends React.Component {
 				<JobList
 					JobList={this.state.allJobs} 
 				/>
+				{ this.state.uploadUrl ? (
+					<div>
+						<h3>Job asked:</h3>
+						<div className="external-html" 
+							dangerouslySetInnerHTML={this.createMarkup()}>
+						</div>
+					</div>
+				) : (
+				<div></div>
+				) }
 			</div>
-			)
 		)
 	}
 }
