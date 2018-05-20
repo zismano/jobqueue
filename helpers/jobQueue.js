@@ -40,12 +40,15 @@ jobs.process('new_job', function(job, done) {
 				res.on('data', chunk => {
 					body += chunk;
 				})
-				res.on('end', () => {		  		
+				res.on('end', () => {
+					if (body === '') {
+						body = 'URL is not valid';
+					}
 					db.addHTMLtoId(job.id, job.data.url, body, (err, res) => {
 						if (err) throw err;
 						console.log(`id ${job.id}, job ${job.data.url} done fetching html`);
 						done && done();
-					})
+					})						
 				})
 			})
 		  } else {
