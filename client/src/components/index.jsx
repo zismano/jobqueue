@@ -13,10 +13,6 @@ class App extends React.Component {
 		this.state = {
 			uploadUrl: '',
 			allJobs: [],
-			currJob: {
-				url: '',
-				id: '',
-			},
 		}
 		this.fetchUrlFromUser = this.fetchUrlFromUser.bind(this);
 		this.checkJob = this.checkJob.bind(this);
@@ -70,36 +66,47 @@ class App extends React.Component {
 			} else if (title === 'New job') {
 				let allJobs = this.state.allJobs;
 				allJobs.push({url, id});
-				content.setState({ 
-					currJob: { 
-						url, 
-						id,
-					},
-					allJobs,
-				})				
+				content.setState({ allJobs, });			
 			}
 		})
 		.catch(err => { throw err });			
 	}
 
 	checkJob(id) {
-		axios.get(`/id/:${id}`, {
-			params: {
-				id,
-			},
-		})
-		.then(res => {
-			if (res.data === 'Job is still in queue') {
-				alert(`Job of ${id} is still in queue`);
-			} else if (res.data.data === 'URL is not valid') {
-				alert(`Job of ${id}: url ${res.data.url} is not valid`)
-			} else {
-				this.setState({ uploadUrl: res.data.data });
-			}
-		})
+		if (this.isValidId(id)) {
+			axios.get(`/id/:${id}`, {
+				params: {
+					id,
+				},
+			})
+			.then(res => {
+				if (res.data === 'Job is still in queue') {
+					alert(`Job of ${id} is still in queue`);
+				} else if (res.data.data === 'URL is not valid') {
+					alert(`Job of ${id}: url ${res.data.url} is not valid`)
+				} else {
+					this.setState({ uploadUrl: res.data.data });
+				}
+			})				
+		} else {
+			alert(`There's no such id`);
+			
+		}
+	}
+
+	isValidId(id) {
+		let allJobs = this.state.allJobs;
+		if (allJobs.length && 
+			id > 0 &&
+			!(id % 1) &&  
+			id <= allJobs[allJobs.length - 1].id) {
+			return true;
+		}
+		return false;
 	}
 
 	render() {
+		let currJob = this.state.allJobs[this.state.allJobs.length - 1] || { url: '', id: ''};
 		return (
 			this.state.uploadUrl ? (
 			<div dangerouslySetInnerHTML={this.createMarkup()}></div>
@@ -109,7 +116,7 @@ class App extends React.Component {
 				<h2>Please enter a url:</h2>
 				<FetchUrl 
 					FetchUrl={this.fetchUrlFromUser} 
-					currJob={this.state.currJob}
+					currJob={currJob}
 				/>
 				<CheckStatus 
 					checkJob={this.checkJob}
