@@ -96,7 +96,7 @@ class App extends React.Component {
 				/>
 				<CheckStatus 
 					checkJob={this.checkJob}
-				/>								 
+				/>
 			</div>
 			)
 		)
