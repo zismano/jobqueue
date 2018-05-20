@@ -50,5 +50,19 @@ app.get('/id/:id', (req, res) => {
 	// keep track of id (check if user put something else than number)
 });
 
+app.get('/storedJobs', (req, res) => {
+	let jobs = [];
+	db.findAllJobs((err, data) => {
+		if (err) throw err;
+		data.forEach(item => {
+			let job = {
+				id: item.jobId,
+				url: item.url,
+			}
+			jobs.push(job);
+		})
+		res.send(jobs);
+	})
+})
 
 app.listen(3000);
