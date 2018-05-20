@@ -38,7 +38,9 @@ const findHTMLOfId = (id, cb) => {
 	  jobsDB.collection("urls").findOne({"jobId": id})
 	  .then(doc => {
 	  	if (doc) {
-	  		cb(doc.data);
+	  		cb(doc);
+	  	} else {
+	  		cb('No id was found');
 	  	}
 	  })
 	  .catch(err => {
