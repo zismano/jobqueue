@@ -10,18 +10,18 @@ class App extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
+			uploadUrl: '',
 			currJob: {
 				url: '',
 				id: '',
 			},
-			counter: 0,
 		}
 		this.fetchUrlFromUser = this.fetchUrlFromUser.bind(this);
 		this.checkJob = this.checkJob.bind(this);
 	}
 
 	createMarkup() {
-		return {__html: this.state.url}
+		return {__html: this.state.uploadUrl}
 	}
 
 	fetchUrlFromUser(url) {
@@ -32,11 +32,11 @@ class App extends React.Component {
 		}
 	}
 
-	isValidUrl(url) {	// returns true if url has 2-3 dotts in name and no spaces
+	isValidUrl(url) {	// returns true if url has 1-3 dotts in name and no spaces
 		let splittledUrl = url.split(' ');
 		if (splittedUrl.length === 1) {
 			let splittedUrl = url.split('.');
-			if (splittedUrl.length > 1 && splittedUrl.length < 4) {
+			if (splittedUrl.length > 1 && splittedUrl.length < 5) {
 				return true;
 			}
 		}
@@ -49,30 +49,42 @@ class App extends React.Component {
 				url,			
 			},
 		})
-		.then(id => {
-			if (id.data.title === 'Job already has id') {
-				alert(`Job ${id.data.url} already has id ${id.data.id}`);
-			} else if (id.data.title === 'New job') {
-				let counter = content.state.counter;
+		.then(jobId => {
+			let { title, url, id } = jobId.data;
+			if (title === 'Job already has id') {
+				alert(`Job ${url} already has id ${id}`);
+			} else if (title === 'New job') {
 				content.setState({ 
 					currJob: { 
 						url, 
-						id: counter + 1,
+						id,
 					},
-					counter: counter + 1
 				})				
 			}
 		})
 		.catch(err => { throw err });			
 	}
 
-	checkJob(jobId) {
-
+	checkJob(id) {
+		axios.get(`/id/:${id}`, {
+			params: {
+				id,
+			},
+		})
+		.then(res => {
+			if (res.data === 'Job is still in queue') {
+				alert(`Job of ${id} is still in queue`);
+			} else if (res.data.data === 'URL is not valid') {
+				alert(`Job of ${id}: url ${res.data.url} is not valid`)
+			} else {
+				this.setState({ uploadUrl: res.data.data });
+			}
+		})
 	}
 
 	render() {
 		return (
-			this.state.url ? (
+			this.state.uploadUrl ? (
 			<div dangerouslySetInnerHTML={this.createMarkup()}></div>
 			) : (
 			<div>
@@ -84,7 +96,6 @@ class App extends React.Component {
 				/>
 				<CheckStatus 
 					checkJob={this.checkJob}
-					maxJobs={this.state.counter}
 				/>								 
 			</div>
 			)

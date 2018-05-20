@@ -1,12 +1,12 @@
 import React from 'react';
 
 const CheckStatus = props => {
-	let {checkJob, maxJobs } = props;
+	let {checkJob } = props;
 	let jobId;
 	return (
 		<div>
-			<input type="number" min="0" max={maxJobs} ref={input => jobId = input}></input>
-			<button onClick={() => props.checkJob(jobId)}>Check Status of Job ID</button>
+			<input type="number" min="0" ref={input => jobId = input}></input>
+			<button onClick={() => props.checkJob(jobId.value)}>Check Status of Job ID</button>
 		</div>
 	)
 }
