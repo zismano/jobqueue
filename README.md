@@ -8,6 +8,20 @@ User submits www.google.com to your endpoint. The user gets back a job id. Your 
 
 ### Installing Dependencies
 
+From the command line:
+
+Make sure MongoDB server is up by:
+
+```sh
+mongod --dbpath [path to /data/db]
+```
+
+MAke sure Redis server is up by:
+
+```sh
+redis-server
+```
+
 From within the root directory:
 
 ```sh
@@ -23,6 +37,7 @@ From the browser:
 ```sh
 localhost:3000
 ```
+
 ## Requirements
 
 * Node
