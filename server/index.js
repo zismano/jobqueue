@@ -11,9 +11,9 @@ const db = require('../database/index.js');
 
 const jobQueue = require('../helpers/jobQueue.js');
 
-app.post('/url/:url', (req, res) => {
-	let url = req.params.url.split(':')[1];	// extract url from request
-	db.doesUrlHaveJobId(url, (id) => {
+app.post('/url/fetch', (req, res) => {
+	let url = decodeURIComponent(req.query.url);
+	db.doesUrlHaveJobId(url, (id) => {		// check if url already has id
 		if (id) {
 			let responseObject = {
 				title: 'Job already has id',
@@ -39,7 +39,7 @@ app.get('/id/:id', (req, res) => {
 	// check html of id in db
 	db.findHTMLOfId(id, answer => {
 		if (answer === 'No id was found') {
-			res.send('Job is still in queue');
+			res.send('Job is still in queue');	// job is still in queue
 		} else if (answer.data === 'URL is not valid') {
 			res.send(answer);
 		} else {
