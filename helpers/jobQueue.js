@@ -29,14 +29,18 @@ const addJobToQueue = (url, cb) => {	// adds job to queue, on complete - removes
 };
 
 jobs.process('new_job', function(job, done) {
-	let request = http.get({ host: job.data.url }, res => {	// http
+	const url = job.data.url;
+	const indexEndOfHost = job.data.url.indexOf('/');
+	let host = indexEndOfHost !== -1 ? job.data.url.slice(0, indexEndOfHost) : job.data.url;
+	let path = indexEndOfHost !== -1 ? job.data.url.slice(indexEndOfHost) : '/';
+	let request = http.get({ host, path }, res => {	// http
 		let body = '';
 		res.on('data', chunk => {
 			body += chunk;
 		})
 		res.on('end', () => {
 		  if (body === '') {	// if there's no body, check for https (secure) request
-		  	https.get({ host: job.data.url }, res => {	
+		  	https.get({ host, path }, res => {	
 		  		let body = '';
 				res.on('data', chunk => {
 					body += chunk;
@@ -45,26 +49,26 @@ jobs.process('new_job', function(job, done) {
 					if (body === '') {
 						body = 'URL is not valid';
 					}
-					db.addHTMLtoId(job.id, job.data.url, body, (err, res) => {
+					db.addHTMLtoId(job.id, url, body, (err, res) => {
 						if (err) throw err;
-						console.log(`id ${job.id}, job ${job.data.url} done fetching html`);
+						console.log(`id ${job.id}, job ${url} done fetching html`);
 						done && done();
 					})						
 				})
 			})
 		  } else {
-			db.addHTMLtoId(job.id, job.data.url, body, (err, res) => {
+			db.addHTMLtoId(job.id, url, body, (err, res) => {
 				if (err) throw err;
-				console.log(`id ${job.id}, job ${job.data.url} done fetching html`);
+				console.log(`id ${job.id}, job ${url} done fetching html`);
 				done && done();
 			})	  	
 		  }
 		})
 	})
 	request.on('error', (err) => {
-		db.addHTMLtoId(job.id, job.data.url, 'URL is not valid', (err, res) => {
+		db.addHTMLtoId(job.id, url, 'URL is not valid', (err, res) => {
 			if (err) throw err;
-			console.log(`id ${job.id}, job ${job.data.url} is not valid`);
+			console.log(`id ${job.id}, job ${url} is not valid`);
 			done && done();
 		})
 	})
