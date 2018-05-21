@@ -47,7 +47,7 @@ class App extends React.Component {
 			} else if (title === 'New job') {
 				let allJobs = this.state.allJobs;
 				allJobs.push({url, id});
-				content.setState({ allJobs, });			
+				this.setState({ allJobs, });			
 			}
 		})
 		.catch(err => { throw err });			
