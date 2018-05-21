@@ -35,16 +35,8 @@ class App extends React.Component {
 		return {__html: this.state.uploadUrl}
 	}
 
-	fetchUrlFromUser(url) {	// fetches url from user after user enters url, and retrieves job id
+	fetchUrlFromUser(url) {		// retrieves id (or alert) for entered url
 		this.cleanUploadUrl();
-		if (helpers.isValidUrl(url)) {
-			this.getIdForUrl(this, url);
-		} else {
-			alert('Not valid url!');
-		}
-	}
-
-	getIdForUrl(content, url) {		// retrieves id (or alert) for entered url
 		let encodedUrl = encodeURIComponent(url);
 		axios.post(`/url/fetch?url=${encodedUrl}`, {
 		})
