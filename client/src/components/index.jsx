@@ -6,6 +6,7 @@ import CheckStatus from './CheckStatus.jsx';
 import JobList from './JobList.jsx';
 
 const axios = require('axios');
+const helpers = require('../../../helpers/helpers.js');
 
 class App extends React.Component {
 	constructor(props) {
@@ -36,29 +37,16 @@ class App extends React.Component {
 
 	fetchUrlFromUser(url) {	// fetches url from user after user enters url, and retrieves job id
 		this.cleanUploadUrl();
-		if (this.isValidUrl) {
+		if (helpers.isValidUrl(url)) {
 			this.getIdForUrl(this, url);
 		} else {
-			console.log('not valid url')
+			alert('Not valid url!');
 		}
-	}
-
-	isValidUrl(url) {	// very basic check, returns true if url has 1-3 dotts in name and no spaces
-		let splittledUrl = url.split(' ');
-		if (splittedUrl.length === 1) {
-			let splittedUrl = url.split('.');
-			if (splittedUrl.length > 1 && splittedUrl.length < 5) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	getIdForUrl(content, url) {		// retrieves id (or alert) for entered url
-		axios.post(`/url/:${url}`, {
-			params: {
-				url,			
-			},
+		let encodedUrl = encodeURIComponent(url);
+		axios.post(`/url/fetch?url=${encodedUrl}`, {
 		})
 		.then(jobId => {
 			let { title, url, id } = jobId.data;
@@ -75,7 +63,7 @@ class App extends React.Component {
 
 	checkJob(id) {	// checks status of id, when user enters job id
 		this.cleanUploadUrl();
-		if (this.isValidId(id)) {
+		if (helpers.isValidId(id, this.state.allJobs)) {
 			axios.get(`/id/:${id}`, {
 				params: {
 					id,
@@ -96,17 +84,6 @@ class App extends React.Component {
 		}
 	}
 
-	isValidId(id) {		// checks if id entered is valid. Assumption: last element in allJobs state is highest id
-		let allJobs = this.state.allJobs;
-		if (allJobs.length && 
-			id > 0 &&
-			!(id % 1) &&  
-			id <= allJobs[allJobs.length - 1].id) {
-			return true;
-		}
-		return false;
-	}
-
 	cleanUploadUrl() {	// cleans uploadUrl 
 		this.setState({ uploadUrl: '' });
 	}
@@ -116,7 +93,7 @@ class App extends React.Component {
 		return (
 			<div>
 				<h1>Welcome to Job Queue</h1>
-				<h2>Please enter a url:</h2>
+				<h2>Please enter a url, starting with www (without the http/https):</h2>
 				<FetchUrl 
 					FetchUrl={this.fetchUrlFromUser} 
 					currJob={currJob}
